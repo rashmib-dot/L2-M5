@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Module 5 · Prototyping for Good - HAILM Level 2</title>
+<meta name="description" content="Four interactive H5P activities on human-in-the-loop AI, training data and accountability. HAILM Level 2, Grades 6–8.">
+<style>
+/* ============================================================
+   HAILM L2 · Module 5 · Prototyping for Good
+   Single-file interactive activity site. No external assets.
+   ============================================================ */
+
+:root{
+  --bg:#0A0E1C;
+  --panel:#141B33; --panel2:#1B2447; --panel3:#232E58;
+  --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.18);
+  --ink:#EEF2FF; --ink2:#B9C4E4; --muted:#8592B8;
+  --mango:#FFB02E; --mango2:#FF8A3D;
+  --cyan:#3FE0DA; --violet:#A78BFA; --pink:#FF7AB6;
+  --ok:#43DD9A; --no:#FF6B6B;
+  --r:16px; --r2:22px;
+  --shadow:0 18px 50px -18px rgba(0,0,0,.85);
+  --ff:'Inter','Noto Sans Devanagari','Nirmala UI',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Mangal',Helvetica,Arial,sans-serif;
+  --fd:'Space Grotesk','Inter','Noto Sans Devanagari','Nirmala UI',ui-sans-serif,system-ui,'Mangal',sans-serif;
+  --nav-w:296px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--ff);
+  font-size:16px; line-height:1.6; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(255,176,46,.16), transparent 62%),
+    radial-gradient(820px 520px at 96% 4%, rgba(63,224,218,.14), transparent 60%),
+    radial-gradient(700px 620px at 50% 108%, rgba(167,139,250,.13), transparent 62%);
+}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+img,svg{max-width:100%}
+button{font-family:inherit}
+h1,h2,h3,h4{font-family:var(--fd); line-height:1.2; margin:0}
+p{margin:0 0 .9em}
+a{color:var(--cyan)}
+:focus-visible{outline:3px solid var(--cyan); outline-offset:3px; border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- layout ---------- */
+.app{position:relative;z-index:1;display:flex;min-height:100vh}
+
+/* ---------- sidebar ---------- */
+.nav{
+  width:var(--nav-w); flex:0 0 var(--nav-w); position:sticky; top:0; height:100vh;
+  display:flex; flex-direction:column;
+  background:linear-gradient(180deg,rgba(20,27,51,.96),rgba(10,14,28,.96));
+  border-right:1px solid var(--line); backdrop-filter:blur(12px); z-index:60;
+}
+.brand{padding:18px 18px 12px; border-bottom:1px solid var(--line)}
+.brand .kicker{font:700 10.5px/1 var(--ff); letter-spacing:.16em; text-transform:uppercase; color:var(--mango)}
+.brand h1{font-size:19px; margin:8px 0 4px; letter-spacing:-.02em}
+.brand .sub{font-size:11.5px; color:var(--muted); letter-spacing:.02em}
+
+.prog{padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:13px}
+.ring{position:relative; width:52px; height:52px; flex:0 0 52px}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:grid;place-items:center;font:800 13px/1 var(--fd);color:var(--ink)}
+.prog .meta{min-width:0}
+.prog .meta b{display:block;font:800 13px/1.3 var(--fd)}
+.prog .meta span{font-size:11.5px;color:var(--muted)}
+.xp{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 9px;border-radius:999px;
+  background:rgba(255,176,46,.14); border:1px solid rgba(255,176,46,.34); color:var(--mango);
+  font:800 11px/1 var(--fd); letter-spacing:.03em}
+
+.navlist{flex:1 1 auto; overflow-y:auto; padding:10px 10px 16px; scrollbar-width:thin}
+.navlist::-webkit-scrollbar{width:8px}
+.navlist::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:9px}
+.navsec{font:700 10px/1 var(--ff);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  padding:12px 10px 8px}
+.nitem{
+  display:flex; gap:11px; align-items:flex-start; width:100%; text-align:left; cursor:pointer;
+  background:transparent; border:1px solid transparent; color:var(--ink2);
+  padding:9px 10px; border-radius:13px; margin-bottom:3px; transition:.16s;
+}
+.nitem:hover{background:rgba(255,255,255,.055); color:var(--ink)}
+.nitem.on{background:linear-gradient(90deg,rgba(255,176,46,.20),rgba(255,176,46,.05));
+  border-color:rgba(255,176,46,.42); color:#fff}
+.nitem .dot{
+  flex:0 0 25px;height:25px;border-radius:9px;display:grid;place-items:center;
+  background:rgba(255,255,255,.08); border:1px solid var(--line2);
+  font:800 11.5px/1 var(--fd); color:var(--ink2); transition:.16s
+}
+.nitem.on .dot{background:var(--mango);color:#231400;border-color:transparent}
+.nitem.done .dot{background:var(--ok);color:#05271a;border-color:transparent}
+.nitem .tx{min-width:0}
+.nitem .tx b{display:block;font:700 13px/1.35 var(--ff)}
+.nitem .tx span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;
+  text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+.nitem.on .tx span{color:rgba(255,224,170,.9)}
+
+.navfoot{padding:10px 14px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+.tinybtn{flex:1 1 auto;background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--ink2);
+  border-radius:11px;padding:8px 10px;font:700 11.5px/1 var(--ff);cursor:pointer;transition:.15s}
+.tinybtn:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* ---------- main ---------- */
+.main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;
+  padding:11px 22px; background:rgba(10,14,28,.82); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.burger{display:none;background:rgba(255,255,255,.07);border:1px solid var(--line2);color:var(--ink);
+  width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:17px;flex:0 0 auto}
+.crumb{font:700 12px/1 var(--ff);color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.crumb b{color:var(--mango)}
+.steps{margin-left:auto;display:flex;gap:5px;align-items:center}
+.step{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);border:0;padding:0;cursor:pointer;
+  transition:.18s}
+.step:hover{transform:scale(1.35)}
+.step.done{background:var(--ok)}
+.step.on{background:var(--mango);width:24px;border-radius:9px}
+.barline{position:absolute;left:0;bottom:-1px;height:2px;background:linear-gradient(90deg,var(--mango),var(--cyan));
+  transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+.stage{flex:1 1 auto;padding:26px 22px 130px;max-width:1000px;width:100%;margin:0 auto}
+@media (min-width:1500px){.stage{max-width:1080px}}
+
+/* ---------- activity card ---------- */
+.ahead{margin-bottom:20px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.tag{font:800 10.5px/1 var(--ff);letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:999px;
+  border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--ink2)}
+.tag.h5p{background:rgba(63,224,218,.13);border-color:rgba(63,224,218,.38);color:var(--cyan)}
+.tag.time{background:rgba(167,139,250,.13);border-color:rgba(167,139,250,.38);color:var(--violet)}
+.tag.core{background:rgba(255,176,46,.13);border-color:rgba(255,176,46,.38);color:var(--mango)}
+.ahead h2{font-size:clamp(26px,4.4vw,40px);letter-spacing:-.03em;
+  background:linear-gradient(96deg,#fff 20%,#FFD79A 78%);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:#fff}
+.ahead .lede{color:var(--ink2);font-size:16.5px;margin-top:9px;max-width:74ch}
+
+.card{background:linear-gradient(180deg,rgba(27,36,71,.86),rgba(20,27,51,.86));
+  border:1px solid var(--line); border-radius:var(--r2); padding:22px; box-shadow:var(--shadow); margin-bottom:18px}
+.card.tight{padding:16px}
+.card h3{font-size:18px;margin-bottom:6px}
+.card h4{font-size:14px;letter-spacing:.02em;margin-bottom:8px;color:var(--ink)}
+.hint{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink2);
+  background:rgba(63,224,218,.08);border:1px solid rgba(63,224,218,.24);border-radius:14px;padding:12px 14px}
+.hint .ic{flex:0 0 auto;font-size:16px;line-height:1.35}
+.reveal{background:linear-gradient(135deg,rgba(255,176,46,.14),rgba(255,138,61,.07));
+  border:1px solid rgba(255,176,46,.4);border-radius:16px;padding:16px 18px}
+.reveal b{color:var(--mango)}
+.big{font:700 19px/1.45 var(--fd);color:#fff}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  border-radius:13px;padding:12px 20px;font:800 14px/1 var(--ff);letter-spacing:.01em;
+  border:1px solid transparent;transition:transform .12s,filter .16s,background .16s}
+.btn:active{transform:translateY(1px)}
+.btn.p{background:linear-gradient(96deg,var(--mango),var(--mango2));color:#2A1600}
+.btn.p:hover{filter:brightness(1.08)}
+.btn.s{background:rgba(255,255,255,.07);border-color:var(--line2);color:var(--ink)}
+.btn.s:hover{background:rgba(255,255,255,.14)}
+.btn.c{background:linear-gradient(96deg,var(--cyan),#31B7C8);color:#04262A}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* generic option buttons */
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+  background:rgba(255,255,255,.045);border:1.5px solid var(--line2);color:var(--ink);
+  border-radius:15px;padding:14px 16px;margin-bottom:9px;font-size:15px;transition:.15s;line-height:1.45}
+.opt:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.32);transform:translateX(3px)}
+.opt .k{flex:0 0 26px;height:26px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,.1);
+  font:800 12px/1 var(--fd);color:var(--ink2)}
+.opt.right{background:rgba(67,221,154,.15);border-color:var(--ok)}
+.opt.right .k{background:var(--ok);color:#05271a}
+.opt.wrong{background:rgba(255,107,107,.13);border-color:var(--no)}
+.opt.wrong .k{background:var(--no);color:#2b0505}
+.opt:disabled{cursor:default}
+.fb{border-radius:14px;padding:13px 15px;font-size:14.5px;margin-top:4px;line-height:1.5}
+.fb.y{background:rgba(67,221,154,.13);border:1px solid rgba(67,221,154,.4)}
+.fb.n{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4)}
+
+/* footer nav */
+.footnav{
+  position:fixed;left:var(--nav-w);right:0;bottom:0;z-index:55;
+  display:flex;align-items:center;gap:12px;padding:12px 22px;
+  background:rgba(10,14,28,.9);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+}
+.footnav .mid{flex:1 1 auto;text-align:center;min-width:0}
+.footnav .mid .t{font:800 13px/1.3 var(--fd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.footnav .mid .s{font-size:11px;color:var(--muted)}
+.doneflag{display:inline-flex;align-items:center;gap:6px;font:800 11.5px/1 var(--ff);color:var(--ok);
+  background:rgba(67,221,154,.14);border:1px solid rgba(67,221,154,.4);padding:5px 10px;border-radius:999px}
+
+/* mobile */
+.scrim{display:none;position:fixed;inset:0;background:rgba(4,6,14,.68);z-index:59;backdrop-filter:blur(3px)}
+@media (max-width:980px){
+  :root{--nav-w:0px}
+  .nav{position:fixed;left:0;top:0;width:290px;flex-basis:290px;transform:translateX(-102%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:0 0 60px rgba(0,0,0,.6)}
+  body.navopen .nav{transform:none}
+  body.navopen .scrim{display:block}
+  .burger{display:grid;place-items:center}
+  .footnav{left:0}
+  .stage{padding:20px 15px 130px}
+  .topbar{padding:10px 14px}
+  .card{padding:17px;border-radius:18px}
+}
+@media (max-width:560px){
+  .steps{display:none}
+  .footnav{padding:10px 12px}
+  .btn{padding:11px 15px;font-size:13.5px}
+}
+
+/* toast */
+#toasts{position:fixed;right:16px;top:70px;z-index:200;display:flex;flex-direction:column;gap:9px;
+  align-items:flex-end;pointer-events:none}
+.toast{background:linear-gradient(96deg,rgba(35,46,88,.98),rgba(27,36,71,.98));border:1px solid var(--line2);
+  border-left:4px solid var(--mango);border-radius:13px;padding:11px 15px;box-shadow:var(--shadow);
+  font:700 13.5px/1.4 var(--ff);max-width:300px;animation:tin .3s both}
+.toast.ok{border-left-color:var(--ok)}
+@keyframes tin{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes fade{to{opacity:0;transform:translateX(30px)}}
+
+/* confetti */
+#conf{position:fixed;inset:0;z-index:190;pointer-events:none}
+
+/* ---------- activity-specific ---------- */
+/* 1 word cloud */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--ink2);border-radius:999px;
+  padding:8px 14px;font:700 13px/1 var(--ff);cursor:pointer;transition:.15s}
+.chip:hover{background:rgba(255,176,46,.18);border-color:var(--mango);color:#fff}
+.chip.used{opacity:.35;pointer-events:none}
+.cloud{min-height:190px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:center;
+  padding:22px 14px;border-radius:18px;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.05),transparent 70%);
+  border:1px dashed var(--line2)}
+.cw{font-family:var(--fd);font-weight:800;letter-spacing:-.02em;animation:pop .4s cubic-bezier(.34,1.56,.64,1) both;
+  transition:.3s}
+@keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.cw.rule{color:var(--cyan)} .cw.learn{color:var(--mango)}
+.empty{color:var(--muted);font-size:14px;font-style:italic}
+.inputrow{display:flex;gap:9px;flex-wrap:wrap}
+input[type=text],textarea,select{
+  background:rgba(255,255,255,.06);border:1.5px solid var(--line2);color:var(--ink);
+  border-radius:13px;padding:12px 15px;font:500 15px/1.5 var(--ff);width:100%;transition:.15s}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--mango);background:rgba(255,255,255,.1);outline:none}
+textarea{resize:vertical;min-height:130px}
+::placeholder{color:var(--muted)}
+
+/* 2 toaster */
+.scene{display:grid;place-items:center;padding:10px}
+.choicegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.cchoice{cursor:pointer;background:rgba(255,255,255,.05);border:1.5px solid var(--line2);border-radius:17px;
+  padding:18px 15px;text-align:center;transition:.18s;color:var(--ink)}
+.cchoice:hover{transform:translateY(-4px);border-color:var(--mango);background:rgba(255,176,46,.1)}
+.cchoice .em{font-size:38px;display:block;margin-bottom:8px}
+.cchoice b{font:800 14.5px/1.3 var(--fd);display:block}
+.cchoice small{color:var(--muted);font-size:12px}
+.result{text-align:center;padding:8px}
+.result .em{font-size:64px;display:block;animation:pop .45s cubic-bezier(.34,1.56,.64,1) both}
+.tried{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.tried span{font-size:11.5px;font-weight:800;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.07);
+  border:1px solid var(--line2);color:var(--muted)}
+.tried span.ok{color:var(--ok);border-color:rgba(67,221,154,.4)}
+
+/* 3 hotspots */
+.hswrap{position:relative;border-radius:18px;overflow:hidden;background:#0B1226;border:1px solid var(--line)}
+.hs{position:absolute;width:38px;height:38px;border-radius:50%;border:2px solid #fff;cursor:pointer;
+  background:rgba(255,176,46,.9);color:#2A1600;font:800 15px/1 var(--fd);display:grid;place-items:center;
+  transform:translate(-50%,-50%);box-shadow:0 0 0 6px rgba(255,176,46,.22);transition:.18s}
+.hs:hover{transform:translate(-50%,-50%) scale(1.18);box-shadow:0 0 0 11px rgba(255,176,46,.26)}
+.hs.seen{background:var(--ok);color:#05271a;box-shadow:0 0 0 5px rgba(67,221,154,.2)}
+.hs::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid rgba(255,176,46,.7);
+  animation:ping 2s ease-out infinite}
+.hs.seen::after{display:none}
+@keyframes ping{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.1);opacity:0}}
+.hspanel{min-height:96px;border-radius:16px;border:1px solid var(--line2);background:rgba(255,255,255,.045);
+  padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.hspanel .em{font-size:30px;line-height:1}
+.hspanel b{display:block;font:800 15.5px/1.3 var(--fd);margin-bottom:4px}
+.dots{display:flex;gap:6px;margin-top:12px}
+.dots i{width:26px;height:5px;border-radius:9px;background:rgba(255,255,255,.16)}
+.dots i.on{background:var(--ok)}
+
+/* 4 sort */
+.zones{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.zones{grid-template-columns:1fr}}
+.zone{border:2px dashed var(--line2);border-radius:18px;padding:14px;min-height:150px;transition:.18s;
+  background:rgba(255,255,255,.03)}
+.zone.rules{border-color:rgba(63,224,218,.4)}
+.zone.learn{border-color:rgba(255,176,46,.4)}
+.zone.good{border-color:rgba(67,221,154,.45)}
+.zone.good h4{color:var(--ok)}
+.zone.bad{border-color:rgba(255,107,107,.45)}
+.zone.bad h4{color:var(--no)}
+.zone.hot{background:rgba(255,255,255,.1);border-style:solid;transform:scale(1.015)}
+.zone h4{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:10px;letter-spacing:.04em;
+  text-transform:uppercase}
+.zone.rules h4{color:var(--cyan)} .zone.learn h4{color:var(--mango)}
+.bank{display:flex;flex-wrap:wrap;gap:9px;min-height:56px}
+.mcard{cursor:grab;background:linear-gradient(180deg,rgba(35,46,88,.95),rgba(27,36,71,.95));
+  border:1.5px solid var(--line2);border-radius:13px;padding:10px 14px;font:700 13.5px/1.3 var(--ff);
+  display:inline-flex;align-items:center;gap:8px;transition:.15s;user-select:none;touch-action:manipulation}
+.mcard:hover{border-color:var(--mango);transform:translateY(-2px)}
+.mcard.sel{border-color:var(--mango);background:rgba(255,176,46,.2);box-shadow:0 0 0 4px rgba(255,176,46,.18)}
+.mcard.drag{opacity:.4}
+.mcard.good{border-color:var(--ok);background:rgba(67,221,154,.16)}
+.mcard.bad{border-color:var(--no);background:rgba(255,107,107,.16);animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* 5 rover */
+.rvstage{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#05070F}
+.rvbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.04);
+  border-top:1px solid var(--line)}
+.track{flex:1 1 auto;height:7px;border-radius:9px;background:rgba(255,255,255,.13);position:relative;overflow:hidden}
+.track i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--mango),var(--cyan));
+  border-radius:9px;transition:width .3s linear}
+.mark{position:absolute;top:-4px;width:3px;height:15px;background:var(--violet);border-radius:2px}
+.tt{font:800 12px/1 var(--fd);color:var(--ink2);min-width:70px;text-align:right}
+.pausecard{border:1px solid rgba(167,139,250,.45);background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(167,139,250,.05));
+  border-radius:18px;padding:18px}
+.pausecard .lab{font:800 10.5px/1 var(--ff);letter-spacing:.14em;text-transform:uppercase;color:var(--violet);
+  margin-bottom:9px}
+
+/* 6 flashcards */
+.deck{perspective:1400px;max-width:560px;margin:0 auto}
+.flip{position:relative;width:100%;min-height:230px;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);
+  cursor:pointer}
+.flip.f{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 26px;
+  border:1.5px solid var(--line2)}
+.face.front{background:linear-gradient(150deg,#232E58,#1B2447)}
+.face.back{transform:rotateY(180deg);background:linear-gradient(150deg,rgba(255,176,46,.22),rgba(255,138,61,.1));
+  border-color:rgba(255,176,46,.5)}
+.face .lab{font:800 10.5px/1 var(--ff);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.face.back .lab{color:var(--mango)}
+.face .tx{font:700 19.5px/1.45 var(--fd)}
+.face .tip{margin-top:16px;font-size:12px;color:var(--muted)}
+.deckbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:16px;flex-wrap:wrap}
+.pill{font:800 12px/1 var(--fd);color:var(--ink2);background:rgba(255,255,255,.07);border:1px solid var(--line2);
+  padding:8px 13px;border-radius:999px}
+
+/* 7 agamotto */
+.doodle{border-radius:18px;background:#F7F5EE;border:1px solid var(--line);display:grid;place-items:center;padding:8px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:9px;
+  background:linear-gradient(90deg,var(--mango),var(--cyan))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+  background:#fff;border:4px solid var(--mango);margin-top:-9px;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-track{height:8px;border-radius:9px;background:linear-gradient(90deg,var(--mango),var(--cyan))}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--mango)}
+.stagelabs{display:flex;justify-content:space-between;font:700 10.5px/1.3 var(--ff);color:var(--muted);gap:6px}
+.stagelabs span{flex:1;text-align:center}
+.stagelabs span.on{color:var(--mango)}
+
+/* 8 drag the words */
+.sent{font:600 17px/2.3 var(--ff);color:var(--ink);margin-bottom:14px}
+.blank{display:inline-block;min-width:118px;padding:4px 12px;margin:0 3px;border-radius:10px;
+  border:2px dashed var(--line2);background:rgba(255,255,255,.05);text-align:center;font-weight:800;
+  color:var(--muted);transition:.16s;vertical-align:middle;cursor:pointer;font-size:15px}
+.blank.hot{border-color:var(--mango);background:rgba(255,176,46,.16)}
+.blank.filled{border-style:solid;color:#fff;border-color:var(--line2);background:rgba(255,255,255,.12)}
+.blank.good{border-style:solid;border-color:var(--ok);background:rgba(67,221,154,.2);color:#fff}
+.blank.bad{border-style:solid;border-color:var(--no);background:rgba(255,107,107,.2);color:#fff;animation:shake .35s}
+.wordbank{display:flex;flex-wrap:wrap;gap:9px}
+.word{cursor:grab;background:linear-gradient(180deg,rgba(255,176,46,.24),rgba(255,138,61,.12));
+  border:1.5px solid rgba(255,176,46,.5);color:#fff;border-radius:11px;padding:8px 15px;font:800 14px/1 var(--ff);
+  user-select:none;transition:.15s}
+.word:hover{transform:translateY(-2px)}
+.word.sel{box-shadow:0 0 0 4px rgba(255,176,46,.25);transform:translateY(-2px)}
+.word.used{opacity:.25;pointer-events:none}
+
+/* 9 quiz */
+.qmeta{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.scorebig{font:800 44px/1 var(--fd);background:linear-gradient(96deg,var(--mango),var(--cyan));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.qdots{display:flex;gap:5px}
+.qdots i{width:22px;height:6px;border-radius:9px;background:rgba(255,255,255,.16)}
+.qdots i.y{background:var(--ok)} .qdots i.n{background:var(--no)} .qdots i.c{background:var(--mango)}
+
+/* 10 essay */
+.kw{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.kwb{font:800 11.5px/1 var(--ff);padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.06);
+  border:1px solid var(--line2);color:var(--muted);transition:.2s}
+.kwb.hit{background:rgba(67,221,154,.18);border-color:var(--ok);color:#fff}
+.counter{font:700 12px/1 var(--ff);color:var(--muted);margin-top:8px}
+.counter.ok{color:var(--ok)}
+
+/* 11 doc tool */
+.stepper{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stepbtn{flex:1 1 130px;background:rgba(255,255,255,.05);border:1.5px solid var(--line2);border-radius:14px;
+  padding:11px 12px;cursor:pointer;text-align:left;color:var(--ink2);transition:.16s}
+.stepbtn.on{border-color:var(--mango);background:rgba(255,176,46,.14);color:#fff}
+.stepbtn.done{border-color:rgba(67,221,154,.5)}
+.stepbtn b{display:block;font:800 12.5px/1.3 var(--fd)}
+.stepbtn span{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;color:var(--muted)}
+.logrow{display:grid;grid-template-columns:1.3fr 1fr 1.4fr auto;gap:9px;align-items:center;margin-bottom:9px}
+@media (max-width:760px){.logrow{grid-template-columns:1fr;gap:7px;padding-bottom:11px;border-bottom:1px solid var(--line)}}
+.del{background:rgba(255,107,107,.14);border:1px solid rgba(255,107,107,.4);color:var(--no);border-radius:10px;
+  width:38px;height:38px;cursor:pointer;font-size:15px;flex:0 0 38px}
+table.log{width:100%;border-collapse:collapse;font-size:13.5px}
+table.log th{text-align:left;font:800 10.5px/1 var(--ff);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line2)}
+table.log td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+
+/* certificate */
+.cert{background:linear-gradient(150deg,#1B2447,#131A32);border:2px solid rgba(255,176,46,.5);border-radius:24px;
+  padding:34px 28px;text-align:center;position:relative;overflow:hidden}
+.cert::before{content:"";position:absolute;inset:-40% -10% auto;height:70%;
+  background:radial-gradient(circle,rgba(255,176,46,.2),transparent 70%)}
+.cert .seal{font-size:56px}
+.cert h3{font-size:26px;margin:10px 0 4px}
+.badges{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:18px}
+.badge{display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;font:800 12px/1 var(--ff);
+  background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--muted)}
+.badge.got{background:rgba(255,176,46,.16);border-color:rgba(255,176,46,.5);color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.stat{background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:16px;padding:15px;text-align:center}
+.stat b{display:block;font:800 27px/1 var(--fd);color:var(--mango)}
+.stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:800}
+
+/* help modal */
+.modal{position:fixed;inset:0;z-index:210;display:none;place-items:center;padding:20px;
+  background:rgba(4,6,14,.75);backdrop-filter:blur(5px)}
+.modal.on{display:grid}
+.mbox{background:var(--panel2);border:1px solid var(--line2);border-radius:22px;padding:24px;max-width:520px;
+  width:100%;box-shadow:var(--shadow);max-height:86vh;overflow:auto}
+.kbd{display:inline-block;background:rgba(255,255,255,.1);border:1px solid var(--line2);border-radius:7px;
+  padding:2px 8px;font:800 12px/1.6 var(--fd);margin-right:6px}
+ul.clean{margin:0;padding-left:20px;color:var(--ink2);font-size:14.5px}
+ul.clean li{margin-bottom:7px}
+
+/* ---- Module 4: LEGO-style bricks ---- */
+.wslot{display:flex;gap:9px;flex-wrap:wrap;align-items:center;min-height:78px;padding:16px 12px 12px;
+  border:2px dashed var(--line2);border-radius:16px;background:rgba(255,255,255,.03);transition:.18s;margin-top:6px}
+.wslot.hot{border-color:var(--mango);background:rgba(255,176,46,.1)}
+.wslot.good{border-style:solid;border-color:var(--ok);background:rgba(67,221,154,.07)}
+.wslot.bad{border-style:solid;border-color:var(--no);animation:shake .35s}
+.bricktray{display:flex;gap:10px;flex-wrap:wrap;align-items:center;min-height:56px;padding-top:8px}
+.brick{position:relative;border-radius:9px;padding:15px 17px 12px;font:800 17px/1 var(--fd);
+  cursor:pointer;user-select:none;box-shadow:0 4px 0 rgba(0,0,0,.42);transition:transform .12s,box-shadow .12s;
+  margin-top:6px}
+.brick:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.42)}
+.brick:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.42)}
+.brick::before,.brick::after{content:'';position:absolute;top:-6px;width:14px;height:9px;border-radius:5px 5px 2px 2px}
+.brick::before{left:12px} .brick::after{right:12px}
+.brick.c1{background:linear-gradient(180deg,#FFC960,#E8901A);color:#2A1600}
+.brick.c1::before,.brick.c1::after{background:#FFD98A}
+.brick.c2{background:linear-gradient(180deg,#6FE9E4,#25A9A4);color:#04262A}
+.brick.c2::before,.brick.c2::after{background:#93F2EE}
+.brick.c3{background:linear-gradient(180deg,#C4AEFF,#7E5CE6);color:#150E33}
+.brick.c3::before,.brick.c3::after{background:#D9CBFF}
+
+
+/* ---- Module 5: blueprint strip ---- */
+.steprow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;justify-content:center}
+.stepbox{flex:1 1 130px;min-width:120px;background:rgba(255,255,255,.05);border:1.5px solid var(--line2);
+  border-radius:16px;padding:16px 12px;text-align:center}
+.stepbox .em{font-size:30px;line-height:1.1}
+.stepbox b{display:block;font:800 15px/1.3 var(--fd);color:var(--mango);margin-top:8px}
+.stepbox span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
+.steparr{display:flex;align-items:center;color:var(--muted);font:800 20px/1 var(--fd)}
+@media (max-width:640px){.steparr{display:none}}
+
+@media print{.nav,.topbar,.footnav,#stars,.scrim{display:none!important} body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="scrim" id="scrim"></div>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="nav" id="nav" aria-label="Activity navigation">
+    <div class="brand">
+      <div class="kicker" id="bKicker"></div>
+      <h1 id="bTitle"></h1>
+      <div class="sub" id="bSub"></div>
+    </div>
+
+    <div class="prog">
+      <div class="ring">
+        <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="6"/>
+          <circle id="ringfg" cx="26" cy="26" r="22" fill="none" stroke="#FFB02E" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="138.2"
+                  style="transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="pct" id="ringpct">0%</div>
+      </div>
+      <div class="meta">
+        <b id="progtext">0 of 2 done</b>
+        <span id="pSub"></span>
+        <div class="xp">⚡ <span id="xpval">0</span> XP</div>
+      </div>
+    </div>
+
+    <nav class="navlist" id="navlist"></nav>
+
+    <div class="navfoot"><button class="tinybtn" id="langbtn" style="flex:1 1 100%;background:rgba(255,176,46,.14);border-color:rgba(255,176,46,.4);color:var(--mango)"></button>
+      <button class="tinybtn" id="helpbtn"></button>
+      <button class="tinybtn" id="resetbtn"></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <button class="burger" id="burger" aria-label="Open activity menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="steps" id="steps" role="tablist" aria-label="Jump to activity"></div>
+      <div class="barline" id="barline" style="width:0"></div>
+    </div>
+
+    <div class="stage" id="stage" tabindex="-1"></div>
+  </main>
+</div>
+
+<!-- ============ FOOTER NAV ============ -->
+<div class="footnav">
+  <button class="btn s" id="prevbtn"></button>
+  <div class="mid">
+    <div class="t" id="footname">…</div>
+    <div class="s" id="footstate">…</div>
+  </div>
+  <button class="btn p" id="nextbtn"></button>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+<canvas id="conf"></canvas>
+
+<div class="modal" id="help" role="dialog" aria-modal="true" aria-label="Shortcuts">
+  <div class="mbox">
+    <h3 id="helpTitle" style="margin-bottom:12px"></h3>
+    <ul class="clean" id="helpList"></ul>
+    <div class="row" style="margin-top:18px;justify-content:flex-end">
+      <button class="btn p" id="helpclose"></button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<script>
+/* =============================================================
+   ENGINE — द्विभाषी (हिंदी / English)
+   ============================================================= */
+(function(){
+"use strict";
+
+function el(tag, cls, html){var d=document.createElement(tag); if(cls)d.className=cls;
+  if(html!==undefined&&html!==null)d.innerHTML=html; return d;}
+function $(s){return document.querySelector(s);}
+function on(node,ev,fn){node.addEventListener(ev,fn);return node;}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));
+  var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+window.H = {el:el,$:$,on:on,esc:esc,shuffle:shuffle};
+
+/* ---------- language ---------- */
+var LG = 'en';
+window.LGET = function(){ return LG; };
+window.tx = function(obj){ return (obj && obj[LG]!==undefined) ? obj[LG] : obj; };
+
+var UI = {
+  kicker:{hi:'HAILM स्तर 2 · कक्षा 6–8', en:'HAILM Level 2 · Grades 6–8'},
+  title:{hi:'भलाई के लिए प्रोटोटाइप', en:'Prototyping for Good'},
+  sub:{hi:'मॉड्यूल 5 · ह्यूमनेस्ट कोर: स्वायत्तता', en:'Module 5 · Humanest Core: Autonomy'},
+  progSub:{hi:'आपकी प्रगति', en:'Your mission progress'},
+  doneOf:{hi:function(n,t){return t+' में से '+n+' पूरी';}, en:function(n,t){return n+' of '+t+' done';}},
+  navsec:{hi:'गतिविधियाँ', en:'The activities'},
+  help:{hi:'⌨ शॉर्टकट', en:'⌨ Shortcuts'},
+  reset:{hi:'↺ फिर से शुरू', en:'↺ Start over'},
+  lang:{hi:'🌐 Switch to English', en:'🌐 हिंदी में देखें'},
+  crumb:{hi:function(i,t){return 'गतिविधि <b>'+i+'</b> / '+t;}, en:function(i,t){return 'Activity <b>'+i+'</b> of '+t;}},
+  back:{hi:'← पीछे', en:'← Back'},
+  next:{hi:'आगे →', en:'Next →'},
+  finish:{hi:'समाप्त 🏁', en:'Finish 🏁'},
+  completed:{hi:'✓ पूरी हुई', en:'✓ Completed'},
+  helpTitle:{hi:'कैसे चलें 🧭', en:'How to move around 🧭'},
+  helpList:{hi:[
+    '<span class="kbd">→</span> या <b>आगे</b> बटन - अगली गतिविधि पर जाइए',
+    '<span class="kbd">←</span> - एक गतिविधि पीछे जाइए',
+    '<span class="kbd">1</span>–<span class="kbd">4</span> - सीधे उसी गतिविधि पर जाइए',
+    '<span class="kbd">M</span> - गतिविधि मेन्यू खोलिए / बंद कीजिए',
+    '<span class="kbd">Esc</span> - कोई भी पॉप-अप बंद कीजिए',
+    'कुछ भी बंद नहीं है। गतिविधियाँ किसी भी क्रम में कीजिए और कभी भी लौट आइए।',
+    'हर पूरी की गई गतिविधि मेन्यू में <b style="color:#43DD9A">हरी</b> हो जाती है और XP देती है।'
+  ], en:[
+    '<span class="kbd">→</span> or the <b>Next</b> button - go to the next activity',
+    '<span class="kbd">←</span> - go back one activity',
+    '<span class="kbd">1</span>–<span class="kbd">4</span> - jump straight to that activity',
+    '<span class="kbd">M</span> - open / close the activity menu',
+    '<span class="kbd">Esc</span> - close any pop-up',
+    'Nothing is locked. Do the activities in any order and come back any time.',
+    'Every activity you finish turns <b style="color:#43DD9A">green</b> in the menu and earns XP.'
+  ]},
+  gotit:{hi:'समझ गया', en:'Got it'},
+  tip:{hi:'👋 सुझाव: गतिविधियों के बीच जाने के लिए ← → कुंजियाँ या मेन्यू इस्तेमाल कीजिए।',
+       en:'👋 Tip: use ← → keys or the menu to move between activities.'},
+  resetAsk:{hi:'क्या सभी उत्तर मिटाकर फिर से शुरू करें?', en:'Clear all your answers and start again?'},
+  cleared:{hi:'सब मिट गया। नई शुरुआत 🚀', en:'Cleared. Starting fresh 🚀'},
+  upNext:{hi:function(t){return 'आगे: <span style="color:var(--mango)">'+t+'</span>';},
+          en:function(t){return 'Up next: <span style="color:var(--mango)">'+t+'</span>';}},
+  lastOne:{hi:'यह आखिरी गतिविधि थी। बहुत बढ़िया! 🏁', en:'That was the last activity. Well done! 🏁'},
+  revisit:{hi:'आप मेन्यू से किसी भी गतिविधि पर कभी भी लौट सकते हैं।',
+           en:'You can revisit any activity from the menu at any time.'},
+  nextAct:{hi:'अगली गतिविधि →', en:'Next activity →'},
+  seeBadge:{hi:'मेरा बैज देखें 🏆', en:'See my badge 🏆'},
+  certDone:{hi:'मॉड्यूल 5 पूरा!', en:'Module 5 Complete!'},
+  certPart:{hi:'आपकी रिपोर्ट', en:'Your Report'},
+  certDoneTx:{hi:'आपने पूरा चक्र बना लिया: <b>AI अनुमान लगाता है, निर्णय इंसान देता है।</b> डेटा आपने चुना, और आपके ऐप में इंसान को जगह आपने दी।',
+              en:'You built the whole loop: <b>AI gives the prediction, the human gives the decision.</b> You chose the data, and you kept a person in your app.'},
+  certPartTx:{hi:function(n,t){return 'आपने '+t+' में से <b>'+n+'</b> गतिविधियाँ पूरी की हैं। बाकी पूरी करके सारे बैज पाइए।';},
+              en:function(n,t){return 'You have finished <b>'+n+' of '+t+'</b> activities. Come back and finish the rest to unlock every badge.';}},
+  stActs:{hi:'गतिविधियाँ', en:'Activities'},
+  stXp:{hi:'अर्जित XP', en:'XP earned'},
+  dl:{hi:'⬇ मेरी रिपोर्ट डाउनलोड करें', en:'⬇ Download my report'},
+  startOver:{hi:'↺ फिर से शुरू', en:'↺ Start over'},
+  brainfood:{hi:'आगे सोचिए → <i>आपकी अपनी ज़िंदगी में कहाँ आप चाहेंगे कि AI कुछ करने से पहले कोई इंसान जाँच ले?</i>',
+             en:'Brain food → <i>Where in your own life would you want a human check before an AI acts?</i>'},
+  allDone:{hi:'🏆 चारों गतिविधियाँ पूरी! नीचे अपना बैज देखिए।', en:'🏆 All four activities done! Scroll down for your badge.'},
+  actDone:{hi:function(i,x){return '✅ गतिविधि '+i+' पूरी · +'+x+' XP';}, en:function(i,x){return '✅ Activity '+i+' complete · +'+x+' XP';}},
+  badges:{hi:[['🌾','चक्र समझने वाला'],['🗑️','ईमानदार ट्रेनर'],['🤝','ज़िम्मेदारी विशेषज्ञ'],['🦸','लोकल हीरो'],['🏆','मॉड्यूल 5 मास्टर']],
+          en:[['🌾','Loop Tracer'],['🗑️','Honest Trainer'],['🤝','Accountability Ace'],['🦸','Local Hero'],['🏆','Module 5 Master']]},
+  dlToast:{hi:'⬇ रिपोर्ट डाउनलोड हो गई', en:'⬇ Report downloaded'},
+  snag:{hi:'इस गतिविधि में कोई दिक्कत आ गई।', en:'This activity hit a snag.'}
+};
+function U(k){ var v=UI[k]; return v[LG]; }
+window.U = U;
+
+/* ---------- state ---------- */
+var S = {cur:0, done:{}, xp:0, data:{}};
+window.HS = S;
+
+/* ---------- toast ---------- */
+var toastBox = $('#toasts');
+function toast(msg, kind){
+  var t = el('div','toast'+(kind==='ok'?' ok':''), msg);
+  toastBox.appendChild(t);
+  setTimeout(function(){t.style.animation='fade .35s both';
+    setTimeout(function(){t.remove();},360);}, 2600);
+}
+window.toast = toast;
+
+/* ---------- confetti ---------- */
+var cf = $('#conf'), cx = cf.getContext('2d'), parts = [], raf = null;
+function sizeCf(){cf.width=innerWidth; cf.height=innerHeight;}
+sizeCf(); addEventListener('resize', sizeCf);
+function confetti(n){
+  n = n||90;
+  var cols = ['#FFB02E','#3FE0DA','#A78BFA','#FF7AB6','#43DD9A','#FFFFFF'];
+  for(var i=0;i<n;i++) parts.push({
+    x: innerWidth/2 + (Math.random()-.5)*innerWidth*.7, y: innerHeight*.28 + Math.random()*60,
+    vx:(Math.random()-.5)*9, vy:-Math.random()*11-4, g:.28+Math.random()*.16,
+    s:5+Math.random()*7, r:Math.random()*6.28, vr:(Math.random()-.5)*.3,
+    c:cols[(Math.random()*cols.length)|0]
+  });
+  if(!raf) raf = requestAnimationFrame(step);
+}
+function step(){
+  cx.clearRect(0,0,cf.width,cf.height);
+  for(var i=parts.length-1;i>=0;i--){
+    var p=parts[i]; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vx*=.995;
+    if(p.y>innerHeight+40){parts.splice(i,1);continue;}
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle=p.c;
+    cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); cx.restore();
+  }
+  if(parts.length) raf = requestAnimationFrame(step); else {raf=null; cx.clearRect(0,0,cf.width,cf.height);}
+}
+window.confetti = confetti;
+
+/* ---------- starfield ---------- */
+(function(){
+  var c=$('#stars'), g=c.getContext('2d'), stars=[];
+  function build(){
+    c.width=innerWidth; c.height=innerHeight; stars=[];
+    var n=Math.min(150, Math.round(innerWidth*innerHeight/12000));
+    for(var i=0;i<n;i++) stars.push({x:Math.random()*c.width,y:Math.random()*c.height,
+      r:Math.random()*1.25+.25,a:Math.random(),d:(Math.random()*.014)+.003});
+  }
+  build(); addEventListener('resize',build);
+  (function loop(){
+    g.clearRect(0,0,c.width,c.height);
+    for(var i=0;i<stars.length;i++){var s=stars[i]; s.a+=s.d; if(s.a>1||s.a<.12)s.d*=-1;
+      g.globalAlpha=Math.max(.1,Math.min(1,s.a)); g.fillStyle='#fff';
+      g.beginPath(); g.arc(s.x,s.y,s.r,0,6.283); g.fill();}
+    g.globalAlpha=1; requestAnimationFrame(loop);
+  })();
+})();
+
+/* ---------- registry ---------- */
+var ACT = [];
+window.reg = function(o){ACT.push(o);};
+window.ACT = ACT;
+
+function api(idx){
+  var a = ACT[idx];
+  return {
+    save:function(k,v){ (S.data[a.id]=S.data[a.id]||{})[k]=v; },
+    get:function(k,dflt){ var d=S.data[a.id]; return (d&&d[k]!==undefined)?d[k]:dflt; },
+    isDone:function(){ return !!S.done[a.id]; },
+    complete:function(msg, xp){
+      if(S.done[a.id]){ return; }
+      var pts = xp||a.xp||100;
+      S.done[a.id]=true; S.xp += pts;
+      toast(msg || UI.actDone[LG](idx+1, pts), 'ok');
+      confetti(Object.keys(S.done).length===ACT.length?200:60);
+      paint(); renderFoot(); refreshCert();
+      if(Object.keys(S.done).length===ACT.length)
+        setTimeout(function(){ toast(U('allDone'),'ok'); },700);
+    }
+  };
+}
+
+/* ---------- chrome painting ---------- */
+function paintChrome(){
+  document.documentElement.lang = LG;
+  $('#bKicker').textContent = U('kicker');
+  $('#bTitle').textContent  = U('title');
+  $('#bSub').textContent    = U('sub');
+  $('#pSub').textContent    = U('progSub');
+  $('#helpbtn').textContent = U('help');
+  $('#resetbtn').textContent= U('reset');
+  $('#langbtn').textContent = U('lang');
+  $('#helpTitle').textContent = U('helpTitle');
+  var hl=$('#helpList'); hl.innerHTML='';
+  U('helpList').forEach(function(t){ hl.appendChild(el('li',null,t)); });
+  $('#helpclose').textContent = U('gotit');
+}
+
+var navlist=$('#navlist'), steps=$('#steps');
+function buildNav(){
+  navlist.innerHTML=''; steps.innerHTML='';
+  navlist.appendChild(el('div','navsec', U('navsec')));
+  ACT.forEach(function(a,i){
+    var b = el('button','nitem'); b.type='button';
+    b.innerHTML = '<span class="dot">'+(i+1)+'</span><span class="tx"><b>'+esc(tx(a.title))+
+                  '</b><span>'+esc(tx(a.h5p))+' · '+esc(tx(a.time))+'</span></span>';
+    on(b,'click',function(){ go(i); document.body.classList.remove('navopen'); });
+    navlist.appendChild(b);
+    var s = el('button','step'); s.type='button';
+    s.title=(i+1)+'. '+tx(a.title);
+    on(s,'click',function(){go(i);});
+    steps.appendChild(s);
+  });
+}
+
+function paint(){
+  var n = Object.keys(S.done).length, tot = ACT.length;
+  var pct = Math.round(n/tot*100);
+  $('#ringfg').style.strokeDashoffset = String(138.2*(1-n/tot));
+  $('#ringpct').textContent = pct+'%';
+  $('#progtext').textContent = UI.doneOf[LG](n,tot);
+  $('#xpval').textContent = S.xp;
+  $('#barline').style.width = pct+'%';
+  var items = navlist.querySelectorAll('.nitem');
+  ACT.forEach(function(a,i){
+    var it=items[i]; if(!it) return;
+    it.classList.toggle('done', !!S.done[a.id]);
+    it.classList.toggle('on', i===S.cur);
+    it.querySelector('.dot').textContent = S.done[a.id]?'✓':(i+1);
+    var st=steps.children[i];
+    st.classList.toggle('done', !!S.done[a.id]);
+    st.classList.toggle('on', i===S.cur);
+  });
+}
+window.paint = paint;
+
+function renderFoot(){
+  var a = ACT[S.cur];
+  $('#footname').textContent = (S.cur+1)+'. '+tx(a.title);
+  $('#footstate').innerHTML = S.done[a.id]
+      ? '<span class="doneflag">'+U('completed')+'</span>'
+      : tx(a.h5p)+' · '+tx(a.time);
+  $('#crumb').innerHTML = UI.crumb[LG](S.cur+1, ACT.length);
+  $('#prevbtn').textContent = U('back');
+  $('#nextbtn').textContent = S.cur===ACT.length-1 ? U('finish') : U('next');
+  $('#prevbtn').disabled = S.cur===0;
+}
+
+/* ---------- render ---------- */
+var stage = $('#stage');
+function go(i, noScroll){
+  if(i<0||i>=ACT.length) return;
+  S.cur=i;
+  var a=ACT[i];
+  stage.innerHTML='';
+  var head = el('div','ahead');
+  var tags = el('div','tags');
+  tags.innerHTML = '<span class="tag h5p">'+esc(tx(a.h5p))+'</span>'+
+                   '<span class="tag time">'+esc(tx(a.time))+'</span>'+
+                   '<span class="tag">'+esc(tx(a.slides))+'</span>';
+  head.appendChild(tags);
+  head.appendChild(el('h2',null, esc((i+1)+'. '+tx(a.title))));
+  head.appendChild(el('p','lede', tx(a.lede)));
+  stage.appendChild(head);
+
+  var body=el('div'); stage.appendChild(body);
+  try{ a.render(body, api(i)); }
+  catch(err){ body.appendChild(el('div','card','<b style="color:#FF6B6B">'+U('snag')+'</b><br>'+esc(err.message))); }
+
+  var jump = el('div','card tight');
+  jump.style.cssText='display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between';
+  jump.appendChild(el('div',null,'<div style="font:700 13px/1.4 var(--fd)">'+
+    (i===ACT.length-1 ? U('lastOne') : UI.upNext[LG](esc(tx(ACT[i+1].title))))+
+    '</div><div style="font-size:12px;color:var(--muted)">'+U('revisit')+'</div>'));
+  var rw = el('div','row');
+  if(i>0){ var bk=el('button','btn s', U('back'));
+    on(bk,'click',function(){go(i-1);}); rw.appendChild(bk); }
+  var fw = el('button','btn p', i===ACT.length-1 ? U('seeBadge') : U('nextAct'));
+  on(fw,'click',function(){ i===ACT.length-1 ? showCert() : go(i+1); });
+  rw.appendChild(fw); jump.appendChild(rw);
+  stage.appendChild(jump);
+
+  if(i===ACT.length-1){ var w=el('div'); w.id='certwrap'; w.appendChild(renderCert()); stage.appendChild(w); }
+
+  paint(); renderFoot();
+  if(!noScroll) window.scrollTo({top:0,behavior:'smooth'});
+  try{ history.replaceState(null,'','#a'+(i+1)); }catch(e){}
+}
+window.go = go;
+
+/* ---------- certificate ---------- */
+function renderCert(){
+  var n=Object.keys(S.done).length, tot=ACT.length;
+  var c=el('div','cert');
+  var B = U('badges'), flags=[!!S.done.farmer, !!S.done.label, !!S.done.resp, !!S.done.hero, n===tot];
+  c.innerHTML =
+   '<div class="seal">'+(n===tot?'🏆':'🚀')+'</div>'+
+   '<h3>'+(n===tot?U('certDone'):U('certPart'))+'</h3>'+
+   '<p style="color:var(--ink2);max-width:54ch;margin:6px auto 0">'+
+     (n===tot?U('certDoneTx'):UI.certPartTx[LG](n,tot))+'</p>'+
+   '<div class="grid2" style="margin-top:20px">'+
+     '<div class="stat"><b>'+n+'/'+tot+'</b><span>'+U('stActs')+'</span></div>'+
+     '<div class="stat"><b>'+S.xp+'</b><span>'+U('stXp')+'</span></div>'+
+   '</div><div class="badges"></div>';
+  var bb=c.querySelector('.badges');
+  B.forEach(function(b,ix){ bb.appendChild(el('div','badge'+(flags[ix]?' got':''),
+    '<span>'+b[0]+'</span> '+b[1]+(flags[ix]?'':' 🔒'))); });
+  var row=el('div','row'); row.style.cssText='justify-content:center;margin-top:20px';
+  var dl=el('button','btn p', U('dl')); on(dl,'click',downloadReport);
+  var ag=el('button','btn s', U('startOver')); on(ag,'click',reset);
+  row.appendChild(dl); row.appendChild(ag); c.appendChild(row);
+  c.appendChild(el('div',null,'<div style="font-size:12px;color:var(--muted);margin-top:14px">'+U('brainfood')+'</div>'));
+  return c;
+}
+function refreshCert(){ var w=$('#certwrap'); if(w){ w.innerHTML=''; w.appendChild(renderCert()); } }
+window.refreshCert = refreshCert;
+function showCert(){
+  go(ACT.length-1, true);
+  setTimeout(function(){ var w=$('#certwrap'); if(w) w.scrollIntoView({behavior:'smooth',block:'center'}); },80);
+  if(Object.keys(S.done).length===ACT.length) confetti(200);
+}
+
+function downloadReport(){
+  var hi = LG==='hi';
+  var L=[];
+  L.push(hi?'HAILM स्तर 2 · कक्षा 6–8':'HAILM LEVEL 2 · GRADES 6-8');
+  L.push(hi?'मॉड्यूल 5 - भलाई के लिए प्रोटोटाइप (ह्यूमनेस्ट कोर: स्वायत्तता)':'MODULE 5 - PROTOTYPING FOR GOOD (Humanest Core: Autonomy)');
+  L.push(hi?'यूनेस्को: लागू करना - ज़िम्मेदारी और जवाबदेही':'UNESCO: Apply - Responsibility & Accountability');
+  L.push('='.repeat(58));
+  L.push((hi?'पूरी हुई गतिविधियाँ: ':'Activities completed: ')+Object.keys(S.done).length+' / '+ACT.length);
+  L.push((hi?'अर्जित XP: ':'XP earned: ')+S.xp);
+  L.push('');
+  ACT.forEach(function(a,i){ L.push((S.done[a.id]?'[x] ':'[ ] ')+(i+1)+'. '+tx(a.title)+'  ('+tx(a.h5p)+')'); });
+  var fa=S.data.farmer;
+  if(fa&&fa.seen) L.push((hi?'चक्र के देखे गए पल: ':'Loop moments traced: ')+Object.keys(fa.seen).length+' / 5');
+  var lb=S.data.label;
+  if(lb&&lb.placed) L.push((hi?'सही लेबल लगाए: ':'Items labelled correctly: ')+Object.keys(lb.placed).length+' / 6');
+  var rs=S.data.resp;
+  if(rs&&rs.got) L.push((hi?'पक्के किए गए फ़्लैशकार्ड: ':'Flashcards mastered: ')+Object.keys(rs.got).length+' / 4');
+  var hr=S.data.hero;
+  if(hr&&hr.filled) L.push((hi?'सही भरी गई खाली जगहें: ':'Blanks filled correctly: ')+Object.keys(hr.filled).length+' / 6');
+  L.push('');
+  L.push(hi?'मैं यह सीखकर जा रहा/रही हूँ':'THE IDEA I AM TAKING AWAY');
+  L.push(hi?'AI अनुमान लगाता है। निर्णय इंसान देता है।'
+          :'AI gives the prediction. The human gives the decision.');
+  L.push('');
+  L.push(hi?'मेरा लोकल हीरो: मेरा ऐप एक तस्वीर देखता है, AI एक अनुमान लगाता है,'
+          :'My Local Hero: My app looks at a Photo, the AI makes a Prediction,');
+  L.push(hi?'और फिर कुछ भी होने से पहले एक इंसान पुष्टि पर टैप करता है।'
+          :'and then a Person taps Confirm before anything happens.');
+  L.push(''); L.push('- Humainlearning');
+  var blob=new Blob([L.join('\n')],{type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download = hi?'Module5_Report_HI.txt':'Module5_Report_EN.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast(U('dlToast'),'ok');
+}
+function reset(){ S.done={}; S.xp=0; S.data={}; toast(U('cleared')); go(0); }
+
+/* ---------- wiring ---------- */
+on($('#burger'),'click',function(){document.body.classList.toggle('navopen');});
+on($('#scrim'),'click',function(){document.body.classList.remove('navopen');});
+on($('#prevbtn'),'click',function(){go(S.cur-1);});
+on($('#nextbtn'),'click',function(){ S.cur===ACT.length-1 ? showCert() : go(S.cur+1); });
+on($('#helpbtn'),'click',function(){$('#help').classList.add('on'); document.body.classList.remove('navopen');});
+on($('#helpclose'),'click',function(){$('#help').classList.remove('on');});
+on($('#help'),'click',function(e){ if(e.target===$('#help')) $('#help').classList.remove('on'); });
+on($('#resetbtn'),'click',function(){ if(confirm(U('resetAsk'))) reset(); });
+on($('#langbtn'),'click',function(){
+  LG = (LG==='hi') ? 'en' : 'hi';
+  paintChrome(); buildNav(); go(S.cur, true);
+  toast(LG==='hi'?'भाषा: हिंदी 🇮🇳':'Language: English');
+});
+
+addEventListener('keydown', function(e){
+  var t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;
+  if(e.key==='Escape'){ $('#help').classList.remove('on'); document.body.classList.remove('navopen'); return; }
+  if(e.key==='ArrowRight') go(S.cur+1);
+  else if(e.key==='ArrowLeft') go(S.cur-1);
+  else if(e.key==='m'||e.key==='M') document.body.classList.toggle('navopen');
+  else if(/^[1-9]$/.test(e.key)) go(parseInt(e.key,10)-1);
+});
+
+window.BOOT = function(){
+  paintChrome(); buildNav();
+  var h=(location.hash||'').match(/^#a(\d+)$/);
+  go(h?Math.min(ACT.length,Math.max(1,parseInt(h[1],10)))-1:0, true);
+  setTimeout(function(){ toast(U('tip')); }, 900);
+};
+})();
+
+</script>
+<script>
+/* =============================================================
+   MODULE 5 · Prototyping for Good · Activities 1–4  (bilingual)
+   ============================================================= */
+(function(){
+"use strict";
+var el=H.el, on=H.on, esc=H.esc, shuffle=H.shuffle;
+function card(cls){return el('div','card'+(cls?' '+cls:''));}
+function hint(txt){return el('div','hint','<span class="ic">💡</span><span>'+txt+'</span>');}
+function T(o){ return o[LGET()]; }
+
+/* =============== artwork: the farmer's loop =============== */
+var LOOP_SVG = function(L){
+return '<svg viewBox="0 0 820 400" width="100%" role="img" aria-label="'+L.aria+'">'+
+'<defs>'+
+'<linearGradient id="sky5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101A38"/><stop offset="1" stop-color="#0B1226"/></linearGradient>'+
+'<linearGradient id="pan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E2A50"/><stop offset="1" stop-color="#151E3C"/></linearGradient>'+
+'</defs>'+
+'<rect width="820" height="400" fill="url(#sky5)"/>'+
+
+/* step 1 — photo of the leaf */
+'<g transform="translate(24,34)">'+
+'<rect x="0" y="0" width="216" height="164" rx="18" fill="url(#pan)" stroke="#3FE0DA" stroke-width="2"/>'+
+'<text x="108" y="24" font-size="10.5" font-weight="800" fill="#3FE0DA" text-anchor="middle">'+L.s1+'</text>'+
+'<rect x="26" y="40" width="62" height="104" rx="10" fill="#0E1730" stroke="#5A6790" stroke-width="2.5"/>'+
+'<rect x="32" y="52" width="50" height="74" rx="5" fill="#0A2A1C"/>'+
+'<circle cx="57" cy="136" r="4" fill="#5A6790"/>'+
+'<path d="M46 96 q10 -30 26 -32 q2 20 -10 30 q-8 6 -16 2z" fill="#43DD9A"/>'+
+'<path d="M46 96 q14 -18 26 -32" stroke="#0A2A1C" stroke-width="1.6" fill="none"/>'+
+'<g stroke="#FFB02E" stroke-width="2.5" stroke-linecap="round">'+
+'<path d="M104 62 h10"/><path d="M104 92 h10"/><path d="M104 122 h10"/></g>'+
+'<path d="M140 60 q34 -12 52 14 q14 22 -6 44 q-24 24 -50 6" fill="none" stroke="#43DD9A" stroke-width="7" stroke-linecap="round"/>'+
+'<path d="M156 118 q22 12 40 -4" fill="none" stroke="#2E9E6E" stroke-width="4"/>'+
+'<text x="168" y="152" font-size="26" text-anchor="middle">📷</text>'+
+'</g>'+
+'<path d="M252 116 h34" stroke="#8592B8" stroke-width="4" stroke-linecap="round"/>'+
+'<path d="M280 108 l12 8 l-12 8z" fill="#8592B8"/>'+
+
+/* step 2 — the AI predicts */
+'<g transform="translate(302,34)">'+
+'<rect x="0" y="0" width="216" height="164" rx="18" fill="url(#pan)" stroke="#A78BFA" stroke-width="2"/>'+
+'<text x="108" y="24" font-size="10.5" font-weight="800" fill="#A78BFA" text-anchor="middle">'+L.s2+'</text>'+
+'<rect x="52" y="42" width="112" height="72" rx="14" fill="#241C46" stroke="#A78BFA" stroke-width="2.5"/>'+
+'<circle cx="84" cy="70" r="7" fill="#C4AEFF"/><circle cx="132" cy="70" r="7" fill="#C4AEFF"/>'+
+'<path d="M84 92 q24 12 48 0" stroke="#C4AEFF" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+'<rect x="100" y="26" width="16" height="16" rx="4" fill="#A78BFA"/>'+
+'<rect x="34" y="124" width="148" height="24" rx="8" fill="#3A2050" stroke="#FF9F5A" stroke-width="1.6"/>'+
+'<text x="108" y="140" font-size="11" font-weight="800" fill="#FFB02E" text-anchor="middle">'+L.flag+'</text>'+
+'</g>'+
+'<path d="M530 116 h34" stroke="#8592B8" stroke-width="4" stroke-linecap="round"/>'+
+'<path d="M558 108 l12 8 l-12 8z" fill="#8592B8"/>'+
+
+/* step 3 — the farmer decides */
+'<g transform="translate(580,34)">'+
+'<rect x="0" y="0" width="216" height="164" rx="18" fill="url(#pan)" stroke="#FFB02E" stroke-width="2"/>'+
+'<text x="108" y="24" font-size="10.5" font-weight="800" fill="#FFB02E" text-anchor="middle">'+L.s3+'</text>'+
+'<path d="M62 44 q0 -10 12 -10 q12 0 12 10 q0 4 -12 4 q-12 0 -12 -4z" fill="#E8901A"/>'+
+'<circle cx="74" cy="56" r="11" fill="#D9A06B"/>'+
+'<path d="M50 116 q0 -32 24 -32 q24 0 24 32 z" fill="#43DD9A"/>'+
+'<rect x="118" y="52" width="70" height="26" rx="9" fill="#12341F" stroke="#43DD9A" stroke-width="2"/>'+
+'<text x="153" y="70" font-size="13" font-weight="800" fill="#43DD9A" text-anchor="middle">✓ '+L.yes+'</text>'+
+'<rect x="118" y="88" width="70" height="26" rx="9" fill="#3A1620" stroke="#FF6B6B" stroke-width="2"/>'+
+'<text x="153" y="106" font-size="13" font-weight="800" fill="#FF6B6B" text-anchor="middle">✕ '+L.no+'</text>'+
+'<text x="108" y="150" font-size="10.5" font-weight="800" fill="#8592B8" text-anchor="middle">'+L.decision+'</text>'+
+'</g>'+
+
+/* outcomes */
+'<g transform="translate(96,226)">'+
+'<rect x="0" y="0" width="270" height="150" rx="18" fill="#10271C" stroke="#43DD9A" stroke-width="2"/>'+
+'<text x="135" y="26" font-size="10.5" font-weight="800" fill="#43DD9A" text-anchor="middle">'+L.o1+'</text>'+
+'<g stroke="#43DD9A" stroke-width="5" stroke-linecap="round">'+
+'<path d="M48 122 v-46"/><path d="M92 122 v-56"/><path d="M136 122 v-48"/><path d="M180 122 v-58"/><path d="M224 122 v-44"/></g>'+
+'<g fill="#FFD880">'+
+'<ellipse cx="48" cy="70" rx="7" ry="13"/><ellipse cx="92" cy="60" rx="7" ry="13"/>'+
+'<ellipse cx="136" cy="68" rx="7" ry="13"/><ellipse cx="180" cy="58" rx="7" ry="13"/>'+
+'<ellipse cx="224" cy="72" rx="7" ry="13"/></g>'+
+'<rect x="20" y="122" width="230" height="10" rx="5" fill="#2E5C43"/>'+
+'</g>'+
+'<g transform="translate(452,226)">'+
+'<rect x="0" y="0" width="270" height="150" rx="18" fill="#2E1A22" stroke="#FF6B6B" stroke-width="2"/>'+
+'<text x="135" y="26" font-size="10.5" font-weight="800" fill="#FF6B6B" text-anchor="middle">'+L.o2+'</text>'+
+'<path d="M92 106 q14 -46 46 -52 q4 32 -16 48 q-14 10 -30 4z" fill="#43DD9A"/>'+
+'<path d="M92 106 q22 -28 46 -52" stroke="#12341F" stroke-width="2" fill="none"/>'+
+'<g transform="translate(158,52)">'+
+'<path d="M18 0 l20 34 h-40z" fill="#FF6B6B"/>'+
+'<text x="18" y="28" font-size="15" font-weight="800" fill="#2B0505" text-anchor="middle">!</text></g>'+
+'<text x="176" y="112" font-size="11.5" font-weight="800" fill="#FF6B6B" text-anchor="middle">'+L.sick+'</text>'+
+'<path d="M136 104 l84 -14" stroke="#43DD9A" stroke-width="4" stroke-linecap="round"/>'+
+'</g></svg>';
+};
+
+/* =============== 1 · THE FARMER'S LOOP =============== */
+var A1 = {
+  en:{
+    h3:'🔍 Trace the loop - tap all five dots',
+    hs:[
+      {x:13, y:30, em:'📷', t:'Photo of the leaf', d:'The farmer gives the AI something to look at. Nothing happens until a human points the camera.'},
+      {x:50, y:26, em:'🤖', t:'AI flags the pest or disease', d:'This is a <b>PREDICTION</b>, not a fact. It is the machine’s best guess, with a number attached.'},
+      {x:80, y:26, em:'🧑‍🌾', t:'Farmer makes the final call', d:'This is the <b>DECISION</b>. The farmer knows this field, this season, this leaf. The AI does not.'},
+      {x:28, y:76, em:'🌾', t:'Healthy crop', d:'A mistake was caught before it cost the harvest. That is what the human check is for.'},
+      {x:72, y:76, em:'⚠️', t:'Wrong flag', d:'The AI called a healthy leaf “sick”. The human check saved it, and saved the spray, the money and the plant.'}
+    ],
+    start:'<b>Pick a dot to begin</b><span style="color:var(--muted)">Five moments. Notice where the human sits.</span>',
+    count:function(n){return n+' of 5 moments traced';},
+    big:'AI gives the prediction. The human gives the decision.',
+    body:'Look at the shape of it: the loop starts with a human and ends with a human. The clever part in the middle never gets the last word. That is not a limitation of the technology. It is a <b>choice</b> made by whoever designed the app.',
+    hint:'This is called <b>human-in-the-loop</b> design. Keep it in your head. In Activity 4 you are going to build one.',
+    tDone:'🌾 Loop traced · +140 XP',
+    svg:{aria:'A three step crop disease workflow: photo, AI prediction, farmer decision',
+         s1:'1 · THE FARMER LOOKS', s2:'2 · THE AI PREDICTS', s3:'3 · THE FARMER DECIDES',
+         flag:'LEAF SPOT?  87%', yes:'YES', no:'NO', decision:'THE DECISION IS HERS',
+         o1:'✅ HEALTHY CROP SAVED', o2:'⚠️ WRONG FLAG, CAUGHT', sick:'“SICK”'}
+  },
+  hi:{
+    h3:'🔍 पूरा चक्र समझिए - पाँचों बिंदु टैप कीजिए',
+    hs:[
+      {x:13, y:30, em:'📷', t:'पत्ते की तस्वीर', d:'किसान AI को देखने के लिए कुछ देता है। जब तक कोई इंसान कैमरा नहीं ताकता, कुछ नहीं होता।'},
+      {x:50, y:26, em:'🤖', t:'AI कीट या बीमारी की चेतावनी देता है', d:'यह एक <b>अनुमान</b> है, तथ्य नहीं। यह मशीन का सबसे अच्छा अंदाज़ा है, जिसके साथ एक नंबर जुड़ा है।'},
+      {x:80, y:26, em:'🧑‍🌾', t:'आख़िरी फ़ैसला किसान का', d:'यह है <b>निर्णय</b>। किसान इस खेत को, इस मौसम को, इस पत्ते को जानता है। AI नहीं जानता।'},
+      {x:28, y:76, em:'🌾', t:'स्वस्थ फ़सल', d:'गलती फ़सल बर्बाद होने से पहले पकड़ी गई। इंसानी जाँच इसीलिए है।'},
+      {x:72, y:76, em:'⚠️', t:'गलत चेतावनी', d:'AI ने एक स्वस्थ पत्ते को “बीमार” कह दिया। इंसानी जाँच ने उसे बचा लिया, और दवा, पैसा और पौधा भी।'}
+    ],
+    start:'<b>शुरू करने के लिए कोई बिंदु चुनिए</b><span style="color:var(--muted)">पाँच पल। ध्यान दीजिए कि इंसान कहाँ बैठा है।</span>',
+    count:function(n){return '5 में से '+n+' पल देखे';},
+    big:'AI अनुमान लगाता है। निर्णय इंसान देता है।',
+    body:'इसका आकार देखिए: चक्र इंसान से शुरू होता है और इंसान पर ख़त्म होता है। बीच वाला होशियार हिस्सा कभी आख़िरी बात नहीं कहता। यह तकनीक की कमज़ोरी नहीं है। यह उस इंसान का <b>फ़ैसला</b> है जिसने ऐप बनाया।',
+    hint:'इसे <b>ह्यूमन-इन-द-लूप</b> डिज़ाइन कहते हैं। याद रखिए। गतिविधि 4 में आप ऐसा ही एक ऐप बनाएँगे।',
+    tDone:'🌾 पूरा चक्र समझ लिया · +140 XP',
+    svg:{aria:'फ़सल रोग की तीन-चरणीय प्रक्रिया: तस्वीर, AI का अनुमान, किसान का निर्णय',
+         s1:'1 · किसान देखता है', s2:'2 · AI अनुमान लगाता है', s3:'3 · किसान फ़ैसला करता है',
+         flag:'पत्ती धब्बा?  87%', yes:'हाँ', no:'नहीं', decision:'फ़ैसला किसान का है',
+         o1:'✅ स्वस्थ फ़सल बच गई', o2:'⚠️ गलत चेतावनी, पकड़ी गई', sick:'“बीमार”'}
+  }
+};
+
+reg({
+  id:'farmer', xp:140,
+  title:{en:'The Farmer’s Loop', hi:'किसान का चक्र'},
+  h5p:{en:'Image Hotspots', hi:'तस्वीर के बिंदु'},
+  time:{en:'4–7 min', hi:'4–7 मिनट'},
+  slides:{en:'Slide 7 - Case study', hi:'स्लाइड 7 - केस स्टडी'},
+  lede:{en:'A farmer photographs a leaf. An AI says it might be diseased. Then something important happens. Tap every dot and find where the human sits in this loop.',
+        hi:'एक किसान पत्ते की तस्वीर लेता है। AI कहता है कि शायद बीमारी है। फिर कुछ ज़रूरी होता है। हर बिंदु टैप कीजिए और देखिए कि इस चक्र में इंसान कहाँ है।'},
+  render:function(root, api){
+    var L=T(A1), HS=L.hs;
+    var seen=api.get('seen',{});
+    var c=card(); c.innerHTML='<h3>'+L.h3+'</h3>';
+    var wrap=el('div','hswrap'); wrap.innerHTML=LOOP_SVG(L.svg);
+    HS.forEach(function(h,i){
+      var b=el('button','hs'+(seen[i]?' seen':''), seen[i]?'✓':String(i+1));
+      b.type='button'; b.style.left=h.x+'%'; b.style.top=h.y+'%';
+      b.setAttribute('aria-label',h.t);
+      on(b,'click',function(){ show(i,b); });
+      wrap.appendChild(b);
+    });
+    c.appendChild(wrap);
+    var panel=el('div','hspanel'); panel.style.marginTop='14px';
+    panel.innerHTML='<span class="em">👆</span><div>'+L.start+'</div>';
+    c.appendChild(panel);
+    var dots=el('div','dots'); HS.forEach(function(_,i){ dots.appendChild(el('i', seen[i]?'on':'')); });
+    c.appendChild(dots);
+    var cnt=el('div','counter'); c.appendChild(cnt);
+    root.appendChild(c);
+    var after=el('div'); root.appendChild(after);
+
+    function upd(){
+      var n=Object.keys(seen).length;
+      cnt.textContent=L.count(n); cnt.classList.toggle('ok', n===HS.length);
+      Array.prototype.forEach.call(dots.children,function(d,i){ d.classList.toggle('on', !!seen[i]); });
+      if(n===HS.length) done();
+    }
+    function show(i, btn){
+      seen[i]=true; api.save('seen',seen);
+      if(btn){ btn.classList.add('seen'); btn.textContent='✓'; }
+      var h=HS[i];
+      panel.innerHTML='<span class="em">'+h.em+'</span><div><b>'+h.t+'</b><span>'+h.d+'</span></div>';
+      upd();
+    }
+    function done(){
+      if(after.childNodes.length) return;
+      var f=card();
+      f.innerHTML='<div class="reveal"><div class="big">'+L.big+'</div>'+
+                  '<p style="margin:10px 0 0;color:var(--ink2)">'+L.body+'</p></div>';
+      f.appendChild(hint(L.hint));
+      after.appendChild(f);
+      api.complete(L.tDone, 140);
+    }
+    upd();
+  }
+});
+
+/* =============== 2 · TEACH THE MACHINE — LABEL IT RIGHT! =============== */
+var A2 = {
+  en:{
+    h3:'🗑️ Label it Right!',
+    setup:'You are the trainer today. Every label you choose becomes what the AI believes. Drag an item into a bin, or tap an item, then tap a bin.',
+    zones:[['♻️','Recyclable'],['🌱','Compost'],['🙋','Neither - ask a human first']],
+    bank:'Items to label',
+    count:function(n,t){return n+' of '+t+' labelled';},
+    ok:function(c){return '✅ '+c+'. Good label.';},
+    no:function(c){return '❌ Not that bin. Where would '+c+' actually go at home?';},
+    tapTip:function(c){return 'Now tap the bin for “'+c+'”';},
+    shoeHead:'You had to decide.',
+    shoeBody:'If you force it into the wrong bin, the AI learns your mistake. <b>Bad data in → bad decisions out.</b> An old shoe is neither recyclable nor compost, so the honest answer is not in either bin.',
+    shoeNew:'A third option just appeared. Use it.',
+    shoeOk:'✅ You refused to guess. That is the trainer’s real job, and the machine will never do it for you.',
+    items:[
+      {em:'🧴', t:'Plastic bottle', z:0},
+      {em:'📰', t:'Newspaper',     z:0},
+      {em:'🫙', t:'Glass jar',      z:0},
+      {em:'🍌', t:'Banana peel',    z:1},
+      {em:'🍵', t:'Tea leaves',     z:1},
+      {em:'👟', t:'Old shoe',       z:2, tricky:true}
+    ],
+    big:'You chose the data. Not the machine.',
+    body:'The AI has no opinion about shoes. It will believe whatever you told it, forever, and repeat that belief to every person who uses the app. That is why the label you pick is a <b>responsibility</b>, not a chore.',
+    hint:'Notice what the tricky card really tested: not your knowledge of bins, but whether you would invent an answer rather than admit you did not have one.',
+    tDone:'🗑️ Machine trained honestly · +160 XP'
+  },
+  hi:{
+    h3:'🗑️ सही लेबल लगाइए!',
+    setup:'आज ट्रेनर आप हैं। आप जो भी लेबल चुनेंगे, AI उसी को सच मान लेगा। चीज़ को डिब्बे में खींचिए, या चीज़ टैप कीजिए, फिर डिब्बा टैप कीजिए।',
+    zones:[['♻️','रीसायकल होने वाला'],['🌱','खाद बनने वाला'],['🙋','दोनों नहीं - पहले किसी इंसान से पूछिए']],
+    bank:'लेबल लगाने के लिए चीज़ें',
+    count:function(n,t){return t+' में से '+n+' पर लेबल लगे';},
+    ok:function(c){return '✅ '+c+'। सही लेबल।';},
+    no:function(c){return '❌ यह डिब्बा नहीं। घर पर '+c+' असल में कहाँ जाता है?';},
+    tapTip:function(c){return 'अब “'+c+'” के लिए डिब्बा टैप कीजिए';},
+    shoeHead:'फ़ैसला आपको करना पड़ा।',
+    shoeBody:'अगर आप इसे ज़बरदस्ती गलत डिब्बे में डालेंगे, तो AI आपकी गलती सीख लेगा। <b>ख़राब डेटा अंदर → ख़राब फ़ैसले बाहर।</b> पुराना जूता न रीसायकल होने वाला है, न खाद बनने वाला, तो ईमानदार जवाब इन दोनों डिब्बों में है ही नहीं।',
+    shoeNew:'अभी-अभी एक तीसरा विकल्प आया है। उसका इस्तेमाल कीजिए।',
+    shoeOk:'✅ आपने अंदाज़ा लगाने से मना कर दिया। ट्रेनर का असली काम यही है, और मशीन यह आपके लिए कभी नहीं करेगी।',
+    items:[
+      {em:'🧴', t:'प्लास्टिक की बोतल', z:0},
+      {em:'📰', t:'अख़बार',            z:0},
+      {em:'🫙', t:'काँच का जार',       z:0},
+      {em:'🍌', t:'केले का छिलका',     z:1},
+      {em:'🍵', t:'चाय की पत्ती',      z:1},
+      {em:'👟', t:'पुराना जूता',       z:2, tricky:true}
+    ],
+    big:'डेटा आपने चुना। मशीन ने नहीं।',
+    body:'AI की जूतों के बारे में कोई राय नहीं है। आपने जो बताया, वह हमेशा के लिए वही मानेगा और ऐप इस्तेमाल करने वाले हर इंसान को वही दोहराएगा। इसीलिए आपका चुना हुआ लेबल एक <b>ज़िम्मेदारी</b> है, कोई मामूली काम नहीं।',
+    hint:'ध्यान दीजिए कि मुश्किल कार्ड ने असल में क्या जाँचा: डिब्बों का ज्ञान नहीं, बल्कि यह कि जवाब न होने पर आप जवाब गढ़ लेते हैं या नहीं।',
+    tDone:'🗑️ मशीन को ईमानदारी से सिखाया · +160 XP'
+  }
+};
+
+reg({
+  id:'label', xp:160,
+  title:{en:'Teach the Machine', hi:'मशीन को सिखाइए'},
+  h5p:{en:'Drag & Drop', hi:'खींचिए और छोड़िए'},
+  time:{en:'7–9 min', hi:'7–9 मिनट'},
+  slides:{en:'Slide 8 - Supervised learning', hi:'स्लाइड 8 - पर्यवेक्षित अधिगम'},
+  lede:{en:'This is how apps learn to “see”: a human labels thousands of examples first. Today that human is you, so be careful.',
+        hi:'ऐप इसी तरह “देखना” सीखते हैं: पहले कोई इंसान हज़ारों उदाहरणों पर लेबल लगाता है। आज वह इंसान आप हैं, तो ज़रा सावधानी से।'},
+  render:function(root, api){
+    var L=T(A2), IT=L.items;
+    var placed=api.get('placed',{});
+    var shoeShown=api.get('shoeShown',false);
+    var order=api.get('order',null);
+    if(!order){ order=shuffle(IT.map(function(_,i){return i;})); api.save('order',order); }
+    var sel=null;
+
+    var c=card(); c.innerHTML='<h3>'+L.h3+'</h3>';
+    c.appendChild(hint(L.setup));
+    var zones=el('div','zones'); zones.style.marginTop='14px';
+    var Z=[], zoneBox=[];
+    L.zones.forEach(function(z,zi){
+      var d=el('div','zone '+(zi===2?'learn':(zi===0?'rules':'good')));
+      d.innerHTML='<h4>'+z[0]+' '+z[1]+'</h4>';
+      var inner=el('div','bank'); d.appendChild(inner); Z.push(inner); zoneBox.push(d);
+      if(zi===2){ d.style.display='none'; d.style.gridColumn='1 / -1'; }
+      d.addEventListener('dragover',function(e){e.preventDefault(); d.classList.add('hot');});
+      d.addEventListener('dragleave',function(){d.classList.remove('hot');});
+      d.addEventListener('drop',function(e){e.preventDefault(); d.classList.remove('hot');
+        tryPlace(parseInt(e.dataTransfer.getData('text/plain'),10), zi);});
+      on(d,'click',function(){ if(sel!==null) tryPlace(sel, zi); });
+      zones.appendChild(d);
+    });
+    c.appendChild(zones);
+    c.appendChild(el('div','navsec', L.bank));
+    var bank=el('div','bank srcbank'); c.appendChild(bank);
+    var cnt=el('div','counter'); cnt.style.marginTop='12px'; c.appendChild(cnt);
+    var fb=el('div'); fb.style.marginTop='10px'; c.appendChild(fb);
+    root.appendChild(c);
+    var after=el('div'); root.appendChild(after);
+
+    function mk(i){
+      var it=IT[i];
+      var d=el('div','mcard'+(placed[i]?' good':''),'<span>'+it.em+'</span> '+esc(it.t));
+      d.setAttribute('role','button'); d.tabIndex=0;
+      if(!placed[i]){
+        d.draggable=true;
+        d.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain',String(i)); d.classList.add('drag');});
+        d.addEventListener('dragend',function(){d.classList.remove('drag');});
+        on(d,'click',function(e){ e.stopPropagation(); sel=(sel===i?null:i); draw();
+          if(sel!==null) toast(L.tapTip(it.t)); });
+        on(d,'keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault(); d.click();} });
+        if(sel===i) d.classList.add('sel');
+      }
+      return d;
+    }
+    function draw(){
+      bank.innerHTML=''; Z.forEach(function(z){z.innerHTML='';});
+      zoneBox[2].style.display = shoeShown ? '' : 'none';
+      var left=0;
+      order.forEach(function(i){
+        if(placed[i]) Z[IT[i].z].appendChild(mk(i));
+        else { bank.appendChild(mk(i)); left++; }
+      });
+      if(!left) bank.appendChild(el('div','empty','🎉'));
+      var n=Object.keys(placed).length;
+      cnt.textContent=L.count(n, IT.length); cnt.classList.toggle('ok', n===IT.length);
+      if(n===IT.length) done();
+    }
+    function tryPlace(i, zi){
+      sel=null;
+      if(placed[i]){ draw(); return; }
+      var it=IT[i];
+      if(it.tricky && zi!==2){
+        shoeShown=true; api.save('shoeShown',true);
+        fb.innerHTML='<div class="fb n"><b>'+L.shoeHead+'</b><br>'+L.shoeBody+
+                     '<br><b style="color:var(--mango)">'+L.shoeNew+'</b></div>';
+        draw();
+        zoneBox[2].scrollIntoView({behavior:'smooth',block:'nearest'});
+        return;
+      }
+      if(it.z===zi){
+        placed[i]=true; api.save('placed',placed);
+        fb.innerHTML='<div class="fb y">'+(it.tricky ? L.shoeOk : L.ok(it.t))+'</div>';
+      } else {
+        fb.innerHTML='<div class="fb n">'+L.no(it.t)+'</div>';
+      }
+      draw();
+    }
+    function done(){
+      if(after.childNodes.length) return;
+      var f=card();
+      f.innerHTML='<div class="reveal"><div class="big">'+L.big+'</div>'+
+                  '<p style="margin:10px 0 0;color:var(--ink2)">'+L.body+'</p></div>';
+      f.appendChild(hint(L.hint));
+      after.appendChild(f);
+      api.complete(L.tDone, 160);
+      after.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    draw();
+  }
+});
+
+/* =============== 3 · WHO IS RESPONSIBLE? =============== */
+var A3 = {
+  en:{
+    h3:'🔄 Flip through the deck',
+    cards:[
+      ['You train the AI on good, varied examples.','It sorts waste reliably, and <b>you</b> are responsible for that success.'],
+      ['Your AI starts calling shoes “trash”.','Not the AI’s fault. The trainer chose the data. <b>Bad data in → bad decisions out.</b>'],
+      ['The AI makes a prediction and a person approves it.','Accountability is shared and clear, that is <b>human-in-the-loop</b> design.'],
+      ['An AI acts alone with no human check.','Nobody catches the mistake before it causes harm.']
+    ],
+    qlab:function(n){return 'Card '+n+' · front';}, alab:'Back',
+    tapTip:'Tap the card to flip 🔄', gotTip:'You marked this one “got it” ✓', rateTip:'Rate yourself below ↓',
+    again:'↺ Show me again', ok:'✓ Got it',
+    count:function(n){return n+' of 4 cards mastered';},
+    doneBig:'Responsibility never moves to the machine. ✨',
+    doneTx:'Read the four cards together and a pattern appears: in every single one, the thing that decided the outcome was a human choice: what data to use, and whether to keep a person in the loop.',
+    tGot:function(n){return 'Nice. Card '+n+' mastered ⚡';},
+    tAgain:'No problem. Read the front once more.',
+    tDone:'🤝 All four cards mastered · +120 XP'
+  },
+  hi:{
+    h3:'🔄 डेक पलटकर देखिए',
+    cards:[
+      ['आप AI को अच्छे और विविध उदाहरणों पर ट्रेन करते हैं।','वह कचरा भरोसे से छाँटता है, और इस कामयाबी के ज़िम्मेदार <b>आप</b> हैं।'],
+      ['आपका AI जूतों को “कचरा” कहने लगता है।','यह AI की गलती नहीं। डेटा ट्रेनर ने चुना था। <b>ख़राब डेटा अंदर → ख़राब फ़ैसले बाहर।</b>'],
+      ['AI अनुमान लगाता है और कोई इंसान उसे मंज़ूरी देता है।','ज़िम्मेदारी साझा और साफ़ है, यही <b>ह्यूमन-इन-द-लूप</b> डिज़ाइन है।'],
+      ['AI बिना किसी इंसानी जाँच के अकेले काम करता है।','नुकसान होने से पहले गलती कोई नहीं पकड़ पाता।']
+    ],
+    qlab:function(n){return 'कार्ड '+n+' · सामने';}, alab:'पीछे',
+    tapTip:'पलटने के लिए कार्ड पर टैप कीजिए 🔄', gotTip:'आपने इसे “समझ गया” चिह्नित किया है ✓',
+    rateTip:'नीचे खुद को आँकिए ↓', again:'↺ फिर से दिखाइए', ok:'✓ समझ गया',
+    count:function(n){return '4 में से '+n+' कार्ड पक्के';},
+    doneBig:'ज़िम्मेदारी कभी मशीन पर नहीं जाती। ✨',
+    doneTx:'चारों कार्ड एक साथ पढ़िए और एक पैटर्न दिखता है: हर एक में नतीजा तय करने वाली चीज़ एक इंसानी फ़ैसला थी: कौन-सा डेटा लेना है, और लूप में इंसान को रखना है या नहीं।',
+    tGot:function(n){return 'बढ़िया। कार्ड '+n+' पक्का ⚡';},
+    tAgain:'कोई बात नहीं। सामने वाला हिस्सा एक बार और पढ़िए।',
+    tDone:'🤝 चारों कार्ड पक्के · +120 XP'
+  }
+};
+
+reg({
+  id:'resp', xp:120,
+  title:{en:'Who Is Responsible?', hi:'ज़िम्मेदार कौन है?'},
+  h5p:{en:'Flashcards', hi:'फ़्लैशकार्ड'},
+  time:{en:'7–9 min', hi:'7–9 मिनट'},
+  slides:{en:'Slide 8 - Responsibility check', hi:'स्लाइड 8 - ज़िम्मेदारी जाँच'},
+  lede:{en:'Four situations. For each one, answer <b>out loud</b> before you flip: who is actually responsible here?',
+        hi:'चार स्थितियाँ। हर एक पर पलटने से पहले <b>ज़ोर से</b> जवाब दीजिए: यहाँ असल में ज़िम्मेदार कौन है?'},
+  render:function(root, api){
+    var L=T(A3), CARDS=L.cards, TOT=CARDS.length;
+    var got=api.get('got',{}); var i=0, flipped=false;
+    var c=card(); c.innerHTML='<h3>'+L.h3+'</h3>';
+    var deck=el('div','deck'), flip=el('div','flip');
+    var front=el('div','face front'), back=el('div','face back');
+    flip.appendChild(front); flip.appendChild(back);
+    flip.setAttribute('role','button'); flip.tabIndex=0;
+    deck.appendChild(flip); c.appendChild(deck);
+    var bar=el('div','deckbar');
+    var prev=el('button','btn s','←'); prev.style.padding='11px 15px';
+    var pill=el('div','pill','1 / '+TOT);
+    var next=el('button','btn s','→'); next.style.padding='11px 15px';
+    bar.appendChild(prev); bar.appendChild(pill); bar.appendChild(next); c.appendChild(bar);
+    var rate=el('div','row'); rate.style.cssText='justify-content:center;margin-top:12px';
+    var again=el('button','btn s',L.again), ok=el('button','btn c',L.ok);
+    rate.appendChild(again); rate.appendChild(ok); c.appendChild(rate);
+    var cnt=el('div','counter'); cnt.style.textAlign='center'; c.appendChild(cnt);
+    root.appendChild(c);
+    var after=el('div'); root.appendChild(after);
+
+    function draw(){
+      var cd=CARDS[i];
+      front.innerHTML='<div class="lab">'+L.qlab(i+1)+'</div><div class="tx">'+cd[0]+'</div><div class="tip">'+L.tapTip+'</div>';
+      back.innerHTML='<div class="lab">'+L.alab+'</div><div class="tx">'+cd[1]+'</div><div class="tip">'+(got[i]?L.gotTip:L.rateTip)+'</div>';
+      flip.classList.toggle('f', flipped);
+      pill.textContent=(i+1)+' / '+TOT;
+      var n=Object.keys(got).length;
+      cnt.textContent=L.count(n); cnt.classList.toggle('ok', n===TOT);
+      rate.style.opacity=flipped?'1':'.35'; rate.style.pointerEvents=flipped?'auto':'none';
+      if(n===TOT) done();
+    }
+    function move(d){ i=(i+d+TOT)%TOT; flipped=false; draw(); }
+    on(flip,'click',function(){flipped=!flipped; draw();});
+    on(flip,'keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault(); flipped=!flipped; draw();} });
+    on(prev,'click',function(){move(-1);}); on(next,'click',function(){move(1);});
+    on(ok,'click',function(){ got[i]=true; api.save('got',got);
+      if(Object.keys(got).length<TOT){ toast(L.tGot(i+1)); move(1);} else draw(); });
+    on(again,'click',function(){ flipped=false; draw(); toast(L.tAgain); });
+    function done(){
+      if(after.childNodes.length) return;
+      var f=card();
+      f.innerHTML='<div class="reveal"><div class="big">'+L.doneBig+'</div>'+
+                  '<p style="margin:10px 0 0;color:var(--ink2)">'+L.doneTx+'</p></div>';
+      after.appendChild(f);
+      api.complete(L.tDone, 120);
+    }
+    draw();
+  }
+});
+
+/* =============== 4 · BUILD YOUR LOCAL HERO =============== */
+var A4 = {
+  en:{
+    h3:'🦸 Describe your prototype',
+    bank:'Word bank',
+    ans:['Photo','Prediction','Person','Confirm','Unsure','More'],
+    sents:[
+      ['My app looks at a ',0,', the AI makes a ',1,', and then a ',2,' taps ',3,' before anything happens.'],
+      ['If the AI is ',4,', my app should ask the human ',5,' questions, not fewer.']
+    ],
+    lab2:'Extension',
+    count:function(n){return n+' of 6 blanks filled correctly';},
+    okFb:function(w){return '✅ “'+w+'” fits.';},
+    noFb:function(w){return '❌ “'+w+'” does not go there. Walk the loop again: look → predict → human → confirm.';},
+    tapTip:function(w){return 'Now tap the blank where “'+w+'” belongs';},
+    blueBig:'My Local Hero - blueprint',
+    steps:[['📷','Photo','It looks at'],['🤖','Prediction','The AI guesses'],['🧑','Person','A human checks'],['✅','Confirm','Then it acts']],
+    big:'You just designed a human-in-the-loop app.',
+    body:'Six words, and your prototype already does something a lot of real products forget: it stops and asks. And the second sentence is the part most people get backwards. When a machine is <b>less</b> sure, it should bother the human <b>more</b>, not quietly guess.',
+    hint:'Say the whole thing out loud once. That sentence is your pitch. It explains your entire prototype in about ten seconds.',
+    tDone:'🦸 Local Hero designed · +180 XP'
+  },
+  hi:{
+    h3:'🦸 अपना प्रोटोटाइप बताइए',
+    bank:'शब्द भंडार',
+    ans:['तस्वीर','अनुमान','इंसान','पुष्टि','अनिश्चित','ज़्यादा'],
+    sents:[
+      ['मेरा ऐप एक ',0,' देखता है, AI एक ',1,' लगाता है, और फिर कुछ भी होने से पहले एक ',2,' ',3,' पर टैप करता है।'],
+      ['अगर AI ',4,' है, तो मेरे ऐप को इंसान से ',5,' सवाल पूछने चाहिए, कम नहीं।']
+    ],
+    lab2:'विस्तार',
+    count:function(n){return '6 में से '+n+' खाली जगहें सही भरीं';},
+    okFb:function(w){return '✅ “'+w+'” यहाँ सही बैठता है।';},
+    noFb:function(w){return '❌ “'+w+'” यहाँ नहीं आता। चक्र फिर दोहराइए: देखना → अनुमान → इंसान → पुष्टि।';},
+    tapTip:function(w){return 'अब उस खाली जगह पर टैप कीजिए जहाँ “'+w+'” आता है';},
+    blueBig:'मेरा लोकल हीरो - ख़ाका',
+    steps:[['📷','तस्वीर','यह देखता है'],['🤖','अनुमान','AI अनुमान लगाता है'],['🧑','इंसान','इंसान जाँचता है'],['✅','पुष्टि','फिर काम होता है']],
+    big:'आपने अभी-अभी एक ह्यूमन-इन-द-लूप ऐप डिज़ाइन किया।',
+    body:'छह शब्द, और आपका प्रोटोटाइप वह काम कर रहा है जो कई असली प्रोडक्ट भूल जाते हैं: वह रुककर पूछता है। और दूसरा वाक्य वही हिस्सा है जिसे ज़्यादातर लोग उल्टा समझते हैं। जब मशीन <b>कम</b> यक़ीन में हो, तो उसे इंसान को <b>ज़्यादा</b> टोकना चाहिए, चुपचाप अंदाज़ा नहीं लगाना चाहिए।',
+    hint:'पूरी बात एक बार ज़ोर से बोलिए। यही वाक्य आपकी पिच है। यह आपका पूरा प्रोटोटाइप दस सेकंड में समझा देता है।',
+    tDone:'🦸 लोकल हीरो तैयार · +180 XP'
+  }
+};
+
+reg({
+  id:'hero', xp:180,
+  title:{en:'Build Your Local Hero', hi:'अपना लोकल हीरो बनाइए'},
+  h5p:{en:'Drag the Words', hi:'शब्द खींचिए'},
+  time:{en:'19–25 min', hi:'19–25 मिनट'},
+  slides:{en:'Slide 11 - The prototype', hi:'स्लाइड 11 - प्रोटोटाइप'},
+  lede:{en:'You have sketched an app. Now say what it does in one sentence, the same sentence a real designer would use. Fill all six blanks.',
+        hi:'आपने एक ऐप का ख़ाका बनाया है। अब एक वाक्य में बताइए कि वह करता क्या है, वही वाक्य जो कोई असली डिज़ाइनर बोलता। छहों खाली जगहें भरिए।'},
+  render:function(root, api){
+    var L=T(A4), ANS=L.ans;
+    var filled=api.get('filled',{});
+    var order=api.get('order',null);
+    if(!order){ order=shuffle([0,1,2,3,4,5]); api.save('order',order); }
+    var sel=null;
+
+    var c=card(); c.innerHTML='<h3>'+L.h3+'</h3>';
+    var blanks=[];
+    L.sents.forEach(function(parts, si){
+      if(si===1) c.appendChild(el('div','navsec', L.lab2));
+      var s=el('div','sent');
+      parts.forEach(function(part){
+        if(typeof part==='string'){ s.appendChild(document.createTextNode(part)); return; }
+        var idx=part;
+        var b=el('span','blank'); b.textContent='________';
+        b.setAttribute('role','button'); b.tabIndex=0;
+        b.addEventListener('dragover',function(e){e.preventDefault(); b.classList.add('hot');});
+        b.addEventListener('dragleave',function(){b.classList.remove('hot');});
+        b.addEventListener('drop',function(e){e.preventDefault(); b.classList.remove('hot');
+          drop(parseInt(e.dataTransfer.getData('text/plain'),10), idx, b);});
+        on(b,'click',function(){ if(sel!==null) drop(sel, idx, b); });
+        on(b,'keydown',function(e){ if((e.key==='Enter'||e.key===' ')&&sel!==null){e.preventDefault(); drop(sel,idx,b);} });
+        blanks[idx]=b; s.appendChild(b);
+      });
+      c.appendChild(s);
+    });
+    c.appendChild(el('div','navsec', L.bank));
+    var bank=el('div','wordbank'); c.appendChild(bank);
+    var cnt=el('div','counter'); cnt.style.marginTop='12px'; c.appendChild(cnt);
+    var fb=el('div'); fb.style.marginTop='10px'; c.appendChild(fb);
+    root.appendChild(c);
+    var after=el('div'); root.appendChild(after);
+
+    function drawBank(){
+      bank.innerHTML='';
+      order.forEach(function(wi){
+        var used=!!filled[wi];
+        var d=el('div','word'+(used?' used':'')+(sel===wi?' sel':''), ANS[wi]);
+        d.draggable=!used; d.setAttribute('role','button'); d.tabIndex=used?-1:0;
+        d.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain',String(wi)); sel=wi;});
+        on(d,'click',function(){ sel=(sel===wi?null:wi); drawBank(); if(sel!==null) toast(L.tapTip(ANS[wi])); });
+        on(d,'keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault(); d.click();} });
+        bank.appendChild(d);
+      });
+      var n=Object.keys(filled).length;
+      cnt.textContent=L.count(n); cnt.classList.toggle('ok', n===6);
+      blanks.forEach(function(b,ix){ if(filled[ix]){ b.textContent=ANS[ix]; b.className='blank good'; } });
+      if(n===6) done();
+    }
+    function drop(wi, idx, node){
+      sel=null;
+      if(filled[idx]){ drawBank(); return; }
+      if(wi===idx){
+        filled[idx]=true; api.save('filled',filled);
+        node.textContent=ANS[idx]; node.className='blank good';
+        fb.innerHTML='<div class="fb y">'+L.okFb(ANS[wi])+'</div>';
+      } else {
+        node.classList.add('bad'); node.textContent=ANS[wi];
+        fb.innerHTML='<div class="fb n">'+L.noFb(ANS[wi])+'</div>';
+        setTimeout(function(){ node.className='blank'; node.textContent='________'; }, 750);
+      }
+      drawBank();
+    }
+    function done(){
+      if(after.childNodes.length) return;
+      var bp=card();
+      var html='<div style="text-align:center;font:800 11px/1 var(--ff);letter-spacing:.16em;'+
+               'text-transform:uppercase;color:var(--muted);margin-bottom:16px">'+L.blueBig+'</div>'+
+               '<div class="steprow">';
+      L.steps.forEach(function(s,ix){
+        html+='<div class="stepbox"><div class="em">'+s[0]+'</div><b>'+s[1]+'</b><span>'+s[2]+'</span></div>';
+        if(ix<L.steps.length-1) html+='<div class="steparr">→</div>';
+      });
+      html+='</div>';
+      bp.innerHTML=html;
+      after.appendChild(bp);
+      var f=card();
+      f.innerHTML='<div class="reveal"><div class="big">'+L.big+'</div>'+
+                  '<p style="margin:10px 0 0;color:var(--ink2)">'+L.body+'</p></div>';
+      f.appendChild(hint(L.hint));
+      after.appendChild(f);
+      api.complete(L.tDone, 180);
+      after.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    drawBank();
+  }
+});
+
+BOOT();
+})();
+
+</script>
+</body>
+</html>
